@@ -1,21 +1,40 @@
-import { defineCollection } from 'astro:content';
-import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
 
-const postsCollection = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
+const posts = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/posts" }),
   schema: z.object({
     title: z.string(),
     date: z.string(),
     author: z.string().optional(),
     tags: z.array(z.string()).optional(),
-    readTime: z.string(),
-    excerpt: z.string().optional(), // Optional excerpt for posts list
-    image: z.string().optional(), // Optional cover image for posts list
+    readTime: z.string().optional(),
+    excerpt: z.string().optional(),
+    link: z.string().url().optional(),
+  }),
+});
+
+const projects = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+    organization: z.string().optional(),
+    link: z.string().url().optional(),
+    excerpt: z.string().optional(),
+    techStack: z
+      .array(
+        z.object({
+          name: z.string(),
+          icon: z.string().optional(),
+        }),
+      )
+      .default([]),
+    gallery: z.array(z.string()).default([]),
   }),
 });
 
 export const collections = {
-  posts: postsCollection,
+  posts,
+  projects,
 };
-
