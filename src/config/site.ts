@@ -1,7 +1,7 @@
 // Site-wide configuration
 export const siteConfig = {
   // Site metadata (SEO)
-  name: "ardhisa.com",
+  name: "ardhisa dev",
   title: "Rizkia Adhy Syahputra | Backend Engineer & Full-Stack Developer",
   description:
     "Portfolio and technical blog of Rizkia Adhy Syahputra. Backend Engineer focused on Go, PostgreSQL, Redis, Clean Architecture, and building scalable systems including digital medical record solutions (FHIR/SATUSEHAT).",

@@ -1,54 +1,81 @@
 ---
-import { Astro } from "astro";
 import { siteConfig } from "../config/site";
 
+const base = import.meta.env.BASE_URL;
 const currentPath = Astro.url.pathname;
+
+// helper kecil biar aman untuk GitHub Pages base path
+const withBase = (path: string) => `${base}${path.replace(/^\//, "")}`;
+
+// Active state harus compare pakai base-aware path
+const isActive = (path: string) => currentPath === withBase(path);
+const isActivePrefix = (path: string) => currentPath.startsWith(withBase(path));
 ---
 
 <nav>
-  <a href="/" class="site-name">{siteConfig.name}</a>
+  <a href={withBase("/")} class="site-name">{siteConfig.name}</a>
+
   <ul class="nav-menu">
     <li>
-      <a href="/" class={`menu-link ${currentPath === "/" ? "active" : ""}`}
-        >{siteConfig.navigation.home}</a
-      >
-    </li>
-    <li>
-      <a
-        href="/projects"
-        class={`menu-link ${currentPath.startsWith("/projects") ? "active" : ""}`}
-        >{siteConfig.navigation.projects}</a
-      >
+      <a href={withBase("/")} class={`menu-link ${isActive("/") ? "active" : ""}`}>
+        {siteConfig.navigation.home}
+      </a>
     </li>
 
     <li>
       <a
-        href="/posts"
-        class={`menu-link ${currentPath.startsWith("/posts") ? "active" : ""}`}
-        >{siteConfig.navigation.posts}</a
+        href={withBase("/projects")}
+        class={`menu-link ${isActivePrefix("/projects") ? "active" : ""}`}
       >
+        {siteConfig.navigation.projects}
+      </a>
     </li>
+
     <li>
       <a
-        href="/contact"
-        class={`menu-link ${currentPath.startsWith("/contact") ? "active" : ""}`}
-        >{siteConfig.navigation.contact}</a
+        href={withBase("/posts")}
+        class={`menu-link ${isActivePrefix("/posts") ? "active" : ""}`}
       >
+        {siteConfig.navigation.posts}
+      </a>
     </li>
+
     <li>
       <a
-        href="/comments"
-        class={`menu-link ${currentPath.startsWith("/comments") ? "active" : ""}`}
-        >{siteConfig.navigation.comments}</a
+        href={withBase("/contact")}
+        class={`menu-link ${isActivePrefix("/contact") ? "active" : ""}`}
       >
+        {siteConfig.navigation.contact}
+      </a>
     </li>
+
     <li>
       <a
-        href={siteConfig.resume}
-        target="_blank"
-        class={`menu-link ${currentPath.startsWith("/resume") ? "active" : ""}`}
-        >{siteConfig.navigation.resume}</a
+        href={withBase("/comments")}
+        class={`menu-link ${isActivePrefix("/comments") ? "active" : ""}`}
       >
+        {siteConfig.navigation.comments}
+      </a>
+    </li>
+
+    <li>
+      {(() => {
+        const resumeHref = siteConfig.resume || "";
+        const isExternal = /^https?:\/\//i.test(resumeHref);
+        const href = isExternal ? resumeHref : withBase(resumeHref || "/resume");
+
+        return (
+          <a
+            href={href}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            class={`menu-link ${!isExternal && isActivePrefix("/resume") ? "active" : ""}`}
+          >
+            {siteConfig.navigation.resume}
+          </a>
+        );
+      })()}
     </li>
   </ul>
 </nav>
+

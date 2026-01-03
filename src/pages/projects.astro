@@ -8,6 +8,10 @@ import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config/site";
 
+const base = import.meta.env.BASE_URL;
+const withBase = (path: string) => `${base}${path.replace(/^\//, "")}`;
+const isExternalUrl = (href: string) => /^https?:\/\//i.test(href);
+
 // Get all projects
 const allProjects = (await getCollection("projects")) as CollectionEntry<"projects">[];
 
@@ -15,7 +19,7 @@ const allProjects = (await getCollection("projects")) as CollectionEntry<"projec
 function formatDate(dateString: string): string {
   if (!dateString) return "";
 
-  // handle M/D/YYYY
+  // M/D/YYYY
   if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
     const [m, d, y] = dateString.split("/");
     const dt = new Date(Number(y), Number(m) - 1, Number(d));
@@ -24,7 +28,7 @@ function formatDate(dateString: string): string {
     }
   }
 
-  // handle Mon/DD/YYYY like Jan/05/2025
+  // Mon/DD/YYYY (Jan/05/2025)
   if (/^[A-Za-z]{3}\/\d{1,2}\/\d{4}$/.test(dateString)) {
     const [mon, day, year] = dateString.split("/");
     const map: Record<string, number> = {
@@ -40,7 +44,7 @@ function formatDate(dateString: string): string {
     }
   }
 
-  // fallback to Date parse
+  // ISO-ish or others
   const parsed = new Date(dateString);
   if (!Number.isNaN(parsed.getTime())) {
     return parsed.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -49,32 +53,67 @@ function formatDate(dateString: string): string {
   return "";
 }
 
+// Safer timestamp for sorting
+function toTs(dateString: string): number {
+  if (!dateString) return 0;
+
+  // M/D/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+    const [m, d, y] = dateString.split("/");
+    const dt = new Date(Number(y), Number(m) - 1, Number(d));
+    const t = dt.getTime();
+    return Number.isNaN(t) ? 0 : t;
+  }
+
+  // Mon/DD/YYYY
+  if (/^[A-Za-z]{3}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+    const [mon, day, year] = dateString.split("/");
+    const map: Record<string, number> = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+    };
+    const mm = map[mon];
+    if (mm !== undefined) {
+      const dt = new Date(Number(year), mm, Number(day));
+      const t = dt.getTime();
+      return Number.isNaN(t) ? 0 : t;
+    }
+  }
+
+  // fallback
+  const dt = new Date(dateString);
+  const t = dt.getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
+
 const projects = await Promise.all(
   allProjects.map(async (proj: any) => {
     let slug = proj.slug;
     if (!slug && proj.id) slug = proj.id.split("/").pop()?.replace(/\.md$/, "") || "";
 
+    const rawDate = proj.data.date;
+    const sortTs = toTs(rawDate);
 
     return {
       id: slug,
-      date: formatDate(proj.data.date),
-      rawDate: proj.data.date,
+      slug,
+      date: formatDate(rawDate),
+      rawDate,
+      sortTs,
       title: proj.data.title,
       organization: proj.data.organization || null,
       excerpt: proj.data.excerpt || `Read more about ${proj.data.title}...`,
       link: proj.data.link || null,
       techStack: proj.data.techStack || [],
       gallery: proj.data.gallery || [],
-      slug,
     };
   })
 );
 
-// Sort newest first by raw date (robust-ish)
-// If you want strict sorting, we can store ISO date too.
-projects.sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
+// Sort newest first reliably
+projects.sort((a, b) => (b.sortTs ?? 0) - (a.sortTs ?? 0));
 
-// Group by formatted date (same behavior like posts)
+// Group by formatted date
 const groupedProjects = projects.reduce((acc, p) => {
   const key = p.date || "Unknown date";
   if (!acc[key]) acc[key] = [];
@@ -82,26 +121,25 @@ const groupedProjects = projects.reduce((acc, p) => {
   return acc;
 }, {} as Record<string, typeof projects>);
 
-// Extract all unique tech names for filtering UI (reuse tags UI)
+// Extract all unique tech names for filtering UI
 const allTech = Array.from(
-  new Set(projects.flatMap((p) => (p.techStack || []).map((t: any) => t.name)))
+  new Set(projects.flatMap((p) => (p.techStack || []).map((t: any) => t?.name).filter(Boolean)))
 ).sort();
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>Projects - Ardhisa</title>
     <script>
-      if ("scrollRestoration" in history) {
-        history.scrollRestoration = "manual";
-      }
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
     </script>
   </head>
+
   <body>
     <Navigation />
 
@@ -147,110 +185,124 @@ const allTech = Array.from(
         <div class="tags-filter posts-content-animate">
           <span class="tags-label">Filter by tech:</span>
           <div class="tags-list">
-            {
-              allTech.map((tech) => (
-                <button
-                  class="tag-button"
-                  data-tag={tech.toLowerCase().replace(/\s+/g, "-")}
-                >
-                  {tech}
-                </button>
-              ))
-            }
+            {allTech.map((tech) => (
+              <button class="tag-button" data-tag={tech.toLowerCase().replace(/\s+/g, "-")}>
+                {tech}
+              </button>
+            ))}
           </div>
         </div>
 
         <div class="posts-list posts-content-animate">
-          {
-            Object.entries(groupedProjects).map(([date, dateProjects]) => (
-              <div class="date-group" data-date={date}>
-                <h2 class="date-header">{date}</h2>
-                <div class="date-card">
-                  {dateProjects.map((project) => {
-                    const isExternal = !!project.link;
-                    const href = project.link ?? `/projects/${project.slug}`;
+          {Object.entries(groupedProjects).map(([date, dateProjects]) => (
+            <div class="date-group" data-date={date}>
+              <h2 class="date-header">{date}</h2>
 
-                    return (
-                      <article class="post-item" data-post-id={project.slug}>
-                        <div class="post-summary">
-                          <div class="title-icon-left" />
-                          <h3 class="post-title">
-                            <a
-                              href={href}
-                              class="post-title-link"
-                              target={isExternal ? "_blank" : undefined}
-                              rel={isExternal ? "noopener noreferrer" : undefined}
-                            >
-                              {project.title}
-                            </a>
-                            <div class="title-icon-right" />
-                          </h3>
+              <div class="date-card">
+                {dateProjects.map((project) => {
+                  const isExternal = !!project.link && isExternalUrl(project.link);
+                  const href = isExternal ? project.link : withBase(`/projects/${project.slug}`);
 
-                          <div class="project-meta">
-                             <div> 
-                                {/* Organization (opsional) - tetap di area summary */}
-                                {project.organization && (
-                                    <span class="post-read-time">
-                                       <span>{project.organization}</span>
-                                    </span>
-                                )}, 
-                                {/* pakai read-time slot untuk menampilkan tanggal asli kalau mau */}
-                                <span class="post-read-time">
-                                  {project.rawDate}
-                                </span>
-                             </div>
+                  // image fix for GH Pages
+                  const cover =
+                    project.gallery?.[0]
+                      ? (isExternalUrl(project.gallery[0])
+                          ? project.gallery[0]
+                          : project.gallery[0].startsWith("/")
+                            ? withBase(project.gallery[0])
+                            : project.gallery[0])
+                      : "";
 
-                             <div>
-                                 {/* Tech stack menggantikan tags, pakai class yang sama */}
-                                 {project.techStack &&
-                                    project.techStack.length > 0 && (
-                                      <div class="project-techs">
-                                        {project.techStack.map((t: any) => (
-                                          <div class="project-tech" data-tech={t.name.toLowerCase().replace(/\s+/g, "-")}>
-                                            {t.icon && ( <img src={t.icon} loading="lazy" />)}
-                                            <p>{t.name}</p>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                  return (
+                    <article class="post-item" data-post-id={project.slug}>
+                      <div class="post-summary">
+                        <div class="title-icon-left" />
+                        <h3 class="post-title">
+                          <a
+                            href={href}
+                            class="post-title-link"
+                            target={isExternal ? "_blank" : undefined}
+                            rel={isExternal ? "noopener noreferrer" : undefined}
+                          >
+                            {project.title}
+                          </a>
+                          <div class="title-icon-right" />
+                        </h3>
 
-                                 <button class="post-toggle" aria-label="Toggle post details">
-                                   <span class="post-arrow">↓</span>
-                                 </button>
-                             </div>
+                        <div class="project-meta">
+                          <div>
+                            {project.organization && (
+                              <span class="post-read-time">
+                                <span>{project.organization}</span>
+                              </span>
+                            )}
+                            {project.organization ? ", " : ""}
+                            <span class="post-read-time">{project.rawDate}</span>
                           </div>
-                        </div>
 
+                          <div>
+                            {project.techStack && project.techStack.length > 0 && (
+                              <div class="project-techs">
+                                {project.techStack.map((t: any) => {
+                                  const techKey = (t?.name || "")
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-");
 
-                        {/* Details: deskripsi */}
-                        <div class="post-details">
-                          <div class="post-content-wrapper">
-                            <div class="post-excerpt-wrapper">
-                              <p class="post-excerpt">{project.excerpt}</p>
-                              <div class="post-footer">
+                                  // icon fix for GH Pages
+                                  const iconSrc =
+                                    t?.icon
+                                      ? (isExternalUrl(t.icon)
+                                          ? t.icon
+                                          : t.icon.startsWith("/")
+                                            ? withBase(t.icon)
+                                            : t.icon)
+                                      : null;
 
-
-                                <a
-                                  href={href}
-                                  class="post-read-more"
-                                  target={isExternal ? "_blank" : undefined}
-                                  rel={isExternal ? "noopener noreferrer" : undefined}
-                                  > View project → </a>
-
+                                  return (
+                                    <div class="project-tech" data-tech={techKey}>
+                                      {iconSrc && <img src={iconSrc} loading="lazy" alt="" />}
+                                      <p>{t.name}</p>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                            </div>
-                            <div class="post-image-container">
-                              <img src={project.gallery[0]}  class="project-image" />
-                            </div>
+                            )}
+
+                            <button class="post-toggle" aria-label="Toggle post details">
+                              <span class="post-arrow">↓</span>
+                            </button>
                           </div>
                         </div>
-                      </article>
-                    );
-                  })}
-                </div>
+                      </div>
+
+                      <div class="post-details">
+                        <div class="post-content-wrapper">
+                          <div class="post-excerpt-wrapper">
+                            <p class="post-excerpt">{project.excerpt}</p>
+
+                            <div class="post-footer">
+                              <a
+                                href={href}
+                                class="post-read-more"
+                                target={isExternal ? "_blank" : undefined}
+                                rel={isExternal ? "noopener noreferrer" : undefined}
+                              >
+                                View project →
+                              </a>
+                            </div>
+                          </div>
+
+                          <div class="post-image-container">
+                            {cover && <img src={cover} class="project-image" loading="lazy" alt="" />}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-            ))
-          }
+            </div>
+          ))}
         </div>
       </div>
     </main>
@@ -280,6 +332,7 @@ const allTech = Array.from(
     contentElements.forEach((el) => requestAnimationFrame(() => el.classList.add("visible")));
   });
 
+  // Expand/collapse behavior
   const postToggles = document.querySelectorAll(".post-toggle");
   const postSummaries = document.querySelectorAll(".post-summary");
 
@@ -287,11 +340,11 @@ const allTech = Array.from(
     toggle.addEventListener("click", (e) => {
       e.stopPropagation();
       const postItem = toggle.closest(".post-item");
-      if (postItem) {
-        postItem.classList.toggle("expanded");
-        const arrow = toggle.querySelector(".post-arrow");
-        if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
-      }
+      if (!postItem) return;
+
+      postItem.classList.toggle("expanded");
+      const arrow = toggle.querySelector(".post-arrow");
+      if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
     });
   });
 
@@ -301,11 +354,11 @@ const allTech = Array.from(
       if ((e.target as HTMLElement).closest(".post-toggle")) return;
 
       const postItem = summary.closest(".post-item");
-      if (postItem) {
-        postItem.classList.toggle("expanded");
-        const arrow = postItem.querySelector(".post-arrow");
-        if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
-      }
+      if (!postItem) return;
+
+      postItem.classList.toggle("expanded");
+      const arrow = postItem.querySelector(".post-arrow");
+      if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
     });
   });
 
@@ -319,11 +372,9 @@ const allTech = Array.from(
       postItems.forEach((item) => {
         const title = item.querySelector(".post-title a")?.textContent?.toLowerCase() || "";
         const excerpt = item.querySelector(".post-excerpt")?.textContent?.toLowerCase() || "";
-        if (title.includes(searchTerm) || excerpt.includes(searchTerm)) {
-          (item as HTMLElement).style.display = "block";
-        } else {
-          (item as HTMLElement).style.display = "none";
-        }
+
+        (item as HTMLElement).style.display =
+          title.includes(searchTerm) || excerpt.includes(searchTerm) ? "block" : "none";
       });
 
       const dateGroups = document.querySelectorAll(".date-group");
@@ -336,7 +387,7 @@ const allTech = Array.from(
     });
   }
 
-  // Tech filter reuse tag buttons
+  // Tech filter
   const tagButtons = document.querySelectorAll(".tag-button");
   const dateGroups = document.querySelectorAll(".date-group");
 
@@ -360,18 +411,15 @@ const allTech = Array.from(
       let hasVisible = false;
 
       postItems.forEach((item) => {
-        const techs = Array.from(item.querySelectorAll(".project-tech"))
-          .map((t) => t.getAttribute("data-tech") || "")
+        // IMPORTANT: ambil dari .project-tech[data-tech] (bukan .post-tag)
+        const techs = Array.from(item.querySelectorAll(".project-tech[data-tech]"))
+          .map((el) => el.getAttribute("data-tech") || "")
           .filter(Boolean);
 
         const hasMatch = activeTags.some((a) => techs.includes(a));
 
-        if (hasMatch) {
-          (item as HTMLElement).style.display = "block";
-          hasVisible = true;
-        } else {
-          (item as HTMLElement).style.display = "none";
-        }
+        (item as HTMLElement).style.display = hasMatch ? "block" : "none";
+        if (hasMatch) hasVisible = true;
       });
 
       (dateGroup as HTMLElement).style.display = hasVisible ? "block" : "none";
@@ -385,3 +433,4 @@ const allTech = Array.from(
     });
   });
 </script>
+
