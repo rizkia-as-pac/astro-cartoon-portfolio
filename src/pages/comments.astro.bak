@@ -1,0 +1,567 @@
+---
+import "../styles/home.css";
+import "../styles/comments.css";
+import "../styles/page-transitions.css";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+import GiscusComments from "../components/GiscusComments";
+import { siteConfig } from "../config/site";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Comments & Discussion - Astro Blog</title>
+    <script>
+      // Disable browser scroll restoration and ensure page starts at top
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      // Immediately scroll to top on page load
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+  <body>
+    <Navigation />
+
+    <main class="comments-page">
+      <div class="comments-page-container page-content">
+        <div class="comments-header comments-header-animate">
+          <h1 class="comments-title">{siteConfig.comments.title}</h1>
+          <p class="comments-subtitle">
+            {siteConfig.comments.subtitle}
+          </p>
+          <div class="comments-divider"></div>
+        </div>
+
+        <div class="guidelines-section comments-content-animate">
+          <h2 class="guidelines-title">
+            {siteConfig.comments.guidelines.title}
+          </h2>
+          <ul class="guidelines-list">
+            {
+              siteConfig.comments.guidelines.items.map((item, index) => {
+                const icons = [
+                  {
+                    type: "circle",
+                    element: <circle cx="9" cy="9" r="3.2" fill="#fff" />,
+                  },
+                  {
+                    type: "square",
+                    element: (
+                      <rect
+                        x="5.2"
+                        y="5.2"
+                        width="7.6"
+                        height="7.6"
+                        rx="2"
+                        fill="#fff"
+                      />
+                    ),
+                  },
+                  {
+                    type: "triangle",
+                    element: (
+                      <polygon points="9,5.2 12.8,12.8 5.2,12.8" fill="#fff" />
+                    ),
+                  },
+                  {
+                    type: "pentagon",
+                    element: (
+                      <polygon
+                        points="9,5 13.2,8 11.8,13 6.2,13 4.8,8"
+                        fill="#fff"
+                      />
+                    ),
+                  },
+                  {
+                    type: "star",
+                    element: (
+                      <polygon
+                        points="9,5 10,8 13.2,8.3 10.8,10.3 11.6,13.5 9,11.7 6.4,13.5 7.2,10.3 4.8,8.3 8,8"
+                        fill="#fff"
+                      />
+                    ),
+                  },
+                  {
+                    type: "heart",
+                    element: (
+                      <path
+                        d="M9 14.5s-3.5-2.5-3.5-4.7A2.2 2.2 0 0 1 9 7.5a2.2 2.2 0 0 1 3.5 2.3c0 2.2-3.5 4.7-3.5 4.7z"
+                        fill="#fff"
+                      />
+                    ),
+                  },
+                ];
+                const icon = icons[index] || icons[0];
+                return (
+                  <li class="guideline-item">
+                    <span class={`guideline-icon guideline-icon-${icon.type}`}>
+                      <svg width="18" height="18" viewBox="0 0 18 18">
+                        {icon.element}
+                      </svg>
+                    </span>
+                    {item}
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+
+        <div class="comments-section comments-content-animate">
+          <GiscusComments client:load />
+        </div>
+      </div>
+    </main>
+
+    <Footer />
+
+    <script>
+      // Ensure scroll position is at top after DOM loads
+      document.addEventListener("DOMContentLoaded", () => {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 0);
+      });
+      // Also ensure on page show (handles back/forward navigation)
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          window.scrollTo(0, 0);
+        }
+      });
+
+      // Initialize page transition animations
+      document.addEventListener("DOMContentLoaded", () => {
+        // Trigger page content animation
+        const pageContent = document.querySelector(".page-content");
+        if (pageContent) {
+          requestAnimationFrame(() => {
+            pageContent.classList.add("visible");
+          });
+        }
+
+        // Trigger header animation
+        const header = document.querySelector(".comments-header-animate");
+        if (header) {
+          requestAnimationFrame(() => {
+            header.classList.add("visible");
+          });
+        }
+
+        // Trigger content animations
+        const contentElements = document.querySelectorAll(
+          ".comments-content-animate"
+        );
+        contentElements.forEach((element) => {
+          requestAnimationFrame(() => {
+            element.classList.add("visible");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import "../styles/home.css";
+import "../styles/posts.css";
+import "../styles/projects.css";
+import "../styles/page-transitions.css";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../config/site";
+
+// Get all projects
+const allProjects = (await getCollection("projects")) as CollectionEntry<"projects">[];
+
+console.log("PROJECTS COUNT:", allProjects.length);
+console.log("PROJECT IDS:", allProjects.map((p: any) => p.id));
+console.log("PROJECTS COUNT:", allProjects.length);
+console.log("PROJECT IDS:", allProjects.map((p: any) => p.id));
+
+
+// Robust date formatter: supports "6/27/2025", "Jan/05/2025", "2025-06-27", etc.
+function formatDate(dateString: string): string {
+  if (!dateString) return "";
+
+  // handle M/D/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+    const [m, d, y] = dateString.split("/");
+    const dt = new Date(Number(y), Number(m) - 1, Number(d));
+    if (!Number.isNaN(dt.getTime())) {
+      return dt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    }
+  }
+
+  // handle Mon/DD/YYYY like Jan/05/2025
+  if (/^[A-Za-z]{3}\/\d{1,2}\/\d{4}$/.test(dateString)) {
+    const [mon, day, year] = dateString.split("/");
+    const map: Record<string, number> = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+    };
+    const mm = map[mon];
+    if (mm !== undefined) {
+      const dt = new Date(Number(year), mm, Number(day));
+      if (!Number.isNaN(dt.getTime())) {
+        return dt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      }
+    }
+  }
+
+  // fallback to Date parse
+  const parsed = new Date(dateString);
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  }
+
+  return "";
+}
+
+const projects = await Promise.all(
+  allProjects.map(async (proj: any) => {
+    let slug = proj.slug;
+    if (!slug && proj.id) slug = proj.id.split("/").pop()?.replace(/\.md$/, "") || "";
+
+
+    return {
+      id: slug,
+      date: formatDate(proj.data.date),
+      rawDate: proj.data.date,
+      title: proj.data.title,
+      organization: proj.data.organization || null,
+      excerpt: proj.data.excerpt || `Read more about ${proj.data.title}...`,
+      link: proj.data.link || null,
+      techStack: proj.data.techStack || [],
+      gallery: proj.data.gallery || [],
+      slug,
+    };
+  })
+);
+
+// Sort newest first by raw date (robust-ish)
+// If you want strict sorting, we can store ISO date too.
+projects.sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
+
+// Group by formatted date (same behavior like posts)
+const groupedProjects = projects.reduce((acc, p) => {
+  const key = p.date || "Unknown date";
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(p);
+  return acc;
+}, {} as Record<string, typeof projects>);
+
+// Extract all unique tech names for filtering UI (reuse tags UI)
+const allTech = Array.from(
+  new Set(projects.flatMap((p) => (p.techStack || []).map((t: any) => t.name)))
+).sort();
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Projects - Astro</title>
+    <script>
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+  <body>
+    <Navigation />
+
+    <main class="posts-page">
+      <div class="posts-container page-content">
+        <div class="posts-header posts-header-animate">
+          <h1 class="posts-title">Projects</h1>
+          <p class="posts-subtitle">A collection of projects I’ve built and explored.</p>
+        </div>
+
+        <div class="search-filter-section posts-content-animate">
+          <div class="search-box">
+            <input
+              type="text"
+              placeholder="Search projects..."
+              class="search-input"
+              id="search-input"
+            />
+            <svg
+              class="search-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+              <path
+                d="m19 19-4.35-4.35"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tags-filter posts-content-animate">
+          <span class="tags-label">Filter by tech:</span>
+          <div class="tags-list">
+            {
+              allTech.map((tech) => (
+                <button
+                  class="tag-button"
+                  data-tag={tech.toLowerCase().replace(/\s+/g, "-")}
+                >
+                  {tech}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="posts-list posts-content-animate">
+          {
+            Object.entries(groupedProjects).map(([date, dateProjects]) => (
+              <div class="date-group" data-date={date}>
+                <h2 class="date-header">{date}</h2>
+                <div class="date-card">
+                  {dateProjects.map((project) => {
+                    const isExternal = !!project.link;
+                    const href = project.link ?? `/projects/${project.slug}`;
+
+                    return (
+                      <article class="post-item" data-post-id={project.slug}>
+                        <div class="post-summary">
+                          <div class="title-icon-left" />
+                          <h3 class="post-title">
+                            <a
+                              href={href}
+                              class="post-title-link"
+                              target={isExternal ? "_blank" : undefined}
+                              rel={isExternal ? "noopener noreferrer" : undefined}
+                            >
+                              {project.title}
+                            </a>
+                            <div class="title-icon-right" />
+                          </h3>
+
+                          <div class="project-meta">
+                             <div> 
+                                {/* Organization (opsional) - tetap di area summary */}
+                                {project.organization && (
+                                    <span class="post-read-time">
+                                       <span>{project.organization}</span>
+                                    </span>
+                                )}, 
+                                {/* pakai read-time slot untuk menampilkan tanggal asli kalau mau */}
+                                <span class="post-read-time">
+                                  {project.rawDate}
+                                </span>
+                             </div>
+
+                             <div>
+                                 {/* Tech stack menggantikan tags, pakai class yang sama */}
+                                 {project.techStack &&
+                                    project.techStack.length > 0 && (
+                                      <div class="project-techs">
+                                        {project.techStack.map((t: any) => (
+                                          <div class="project-tech">
+                                            {t.icon && ( <img src={t.icon} loading="lazy" />)}
+                                            <p>{t.name}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                 <button class="post-toggle" aria-label="Toggle post details">
+                                   <span class="post-arrow">↓</span>
+                                 </button>
+                             </div>
+                          </div>
+                        </div>
+
+
+                        {/* Details: deskripsi */}
+                        <div class="post-details">
+                          <div class="post-content-wrapper">
+                            <div class="post-excerpt-wrapper">
+                              <p class="post-excerpt">{project.excerpt}</p>
+                              <div class="post-footer">
+
+
+                                <a
+                                  href={href}
+                                  class="post-read-more"
+                                  target={isExternal ? "_blank" : undefined}
+                                  rel={isExternal ? "noopener noreferrer" : undefined}
+                                  > View project → </a>
+
+                              </div>
+                            </div>
+                            <div class="post-image-container">
+                              <img src={project.gallery[0]} alt={project.title} class="project-image" />
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    window.scrollTo(0, 0);
+    setTimeout(() => window.scrollTo(0, 0), 0);
+  });
+
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) window.scrollTo(0, 0);
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const pageContent = document.querySelector(".page-content");
+    if (pageContent) requestAnimationFrame(() => pageContent.classList.add("visible"));
+
+    const header = document.querySelector(".posts-header-animate");
+    if (header) requestAnimationFrame(() => header.classList.add("visible"));
+
+    const contentElements = document.querySelectorAll(".posts-content-animate");
+    contentElements.forEach((el) => requestAnimationFrame(() => el.classList.add("visible")));
+  });
+
+  const postToggles = document.querySelectorAll(".post-toggle");
+  const postSummaries = document.querySelectorAll(".post-summary");
+
+  postToggles.forEach((toggle) => {
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const postItem = toggle.closest(".post-item");
+      if (postItem) {
+        postItem.classList.toggle("expanded");
+        const arrow = toggle.querySelector(".post-arrow");
+        if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
+      }
+    });
+  });
+
+  postSummaries.forEach((summary) => {
+    summary.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest(".post-title-link")) return;
+      if ((e.target as HTMLElement).closest(".post-toggle")) return;
+
+      const postItem = summary.closest(".post-item");
+      if (postItem) {
+        postItem.classList.toggle("expanded");
+        const arrow = postItem.querySelector(".post-arrow");
+        if (arrow) arrow.textContent = postItem.classList.contains("expanded") ? "↑" : "↓";
+      }
+    });
+  });
+
+  // Search
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      const searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+      const postItems = document.querySelectorAll(".post-item");
+
+      postItems.forEach((item) => {
+        const title = item.querySelector(".post-title a")?.textContent?.toLowerCase() || "";
+        const excerpt = item.querySelector(".post-excerpt")?.textContent?.toLowerCase() || "";
+        if (title.includes(searchTerm) || excerpt.includes(searchTerm)) {
+          (item as HTMLElement).style.display = "block";
+        } else {
+          (item as HTMLElement).style.display = "none";
+        }
+      });
+
+      const dateGroups = document.querySelectorAll(".date-group");
+      dateGroups.forEach((dateGroup) => {
+        const visibleItems = dateGroup.querySelectorAll(
+          '.post-item[style*="block"], .post-item:not([style*="none"])'
+        );
+        (dateGroup as HTMLElement).style.display = visibleItems.length > 0 ? "block" : "none";
+      });
+    });
+  }
+
+  // Tech filter reuse tag buttons
+  const tagButtons = document.querySelectorAll(".tag-button");
+  const dateGroups = document.querySelectorAll(".date-group");
+
+  function applyFilters() {
+    const activeTags = Array.from(tagButtons)
+      .filter((btn) => btn.classList.contains("active"))
+      .map((btn) => btn.getAttribute("data-tag"))
+      .filter((t): t is string => t !== null);
+
+    if (activeTags.length === 0) {
+      dateGroups.forEach((dateGroup) => {
+        const postItems = dateGroup.querySelectorAll(".post-item");
+        postItems.forEach((item) => ((item as HTMLElement).style.display = "block"));
+        (dateGroup as HTMLElement).style.display = "block";
+      });
+      return;
+    }
+
+    dateGroups.forEach((dateGroup) => {
+      const postItems = dateGroup.querySelectorAll(".post-item");
+      let hasVisible = false;
+
+      postItems.forEach((item) => {
+        const techs = Array.from(item.querySelectorAll(".post-tag"))
+          .map((t) => t.getAttribute("data-tech") || "")
+          .filter(Boolean);
+
+        const hasMatch = activeTags.some((a) => techs.includes(a));
+
+        if (hasMatch) {
+          (item as HTMLElement).style.display = "block";
+          hasVisible = true;
+        } else {
+          (item as HTMLElement).style.display = "none";
+        }
+      });
+
+      (dateGroup as HTMLElement).style.display = hasVisible ? "block" : "none";
+    });
+  }
+
+  tagButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      button.classList.toggle("active");
+      applyFilters();
+    });
+  });
+</script>
