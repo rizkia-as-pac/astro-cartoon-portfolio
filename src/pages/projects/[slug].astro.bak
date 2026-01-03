@@ -1,0 +1,300 @@
+---
+import { getCollection } from "astro:content";
+import "../../styles/home.css";
+import "../../styles/post-detail.css";
+import "../../styles/page-transitions.css";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+
+export async function getStaticPaths() {
+  const projects = (await getCollection("projects")) as any[];
+
+  return projects
+    .map((p) => {
+      // resolve slug inline (NO helper)
+      let slug = p?.slug;
+      if (!slug && p?.id) slug = p.id.split("/").pop()?.replace(/\.md$/, "") || "";
+      if (!slug) return null;
+
+      return { params: { slug } };
+    })
+    .filter(Boolean);
+}
+
+const slug = Astro.params.slug;
+if (!slug) throw new Error("Missing project slug");
+
+// ambil ulang data dari collection (biar tidak kehilangan body/render)
+const allProjects = (await getCollection("projects")) as any[];
+
+const project = allProjects.find((p) => {
+  let s = p?.slug;
+  if (!s && p?.id) s = p.id.split("/").pop()?.replace(/\.md$/, "") || "";
+  return s === slug;
+});
+
+if (!project) throw new Error(`Project not found for slug: ${slug}`);
+
+// Render markdown content (v6 alpha friendly)
+let Content: any = null;
+let htmlFallback = "";
+
+// 1) prefer rendered.Content kalau ada
+if (project?.rendered && typeof project.rendered === "object" && project.rendered.Content) {
+  Content = project.rendered.Content;
+}
+// 2) fallback ke body manual render
+else if (typeof project?.body === "string" && project.body.trim().length > 0) {
+  const { unified } = await import("unified");
+  const remarkParse = (await import("remark-parse")).default;
+  const remarkRehype = (await import("remark-rehype")).default;
+  const rehypeStringify = (await import("rehype-stringify")).default;
+
+  const processor = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify);
+  const result = await processor.process(project.body);
+  htmlFallback = String(result);
+}
+// 3) kalau body kosong: tampilkan excerpt biar ada deskripsi
+else if (project?.data?.excerpt) {
+  htmlFallback = `<p>${String(project.data.excerpt)}</p>`;
+} else {
+  htmlFallback = `<p>No description.</p>`;
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{project.data.title} - Projects</title>
+    <script>
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    </script>
+  </head>
+
+  <body>
+    <Navigation />
+
+    <main class="post-detail-page">
+      <div class="post-detail-container page-content">
+        <div class="post-header-card post-header-animate">
+          <h1 class="post-detail-title">{project.data.title}</h1>
+
+          {
+            project.data.techStack &&
+              project.data.techStack.length > 0 && (
+                <div class="post-detail-tags">
+                  {project.data.techStack.map((t: any) => (
+                    <span class="post-detail-tag">
+                      {t.icon && (
+                        <img
+                          src={t.icon}
+                          alt=""
+                          style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"
+                          loading="lazy"
+                        />
+                      )}
+                      {t.name}
+                    </span>
+                  ))}
+                </div>
+              )
+          }
+
+          <div class="post-detail-meta">
+            <a href="/projects" class="post-back-button"> ← Back to Projects </a>
+
+            <div class="post-detail-meta-info">
+              <img
+                src="/image/20943608.jpeg"
+                alt={project.data.organization || project.data.title || "Project"}
+                class="post-detail-avatar"
+              />
+
+              {project.data.organization && (
+                <span class="post-detail-author">{project.data.organization}</span>
+              )}
+
+              <span class="post-detail-date">{project.data.date}</span>
+
+              {project.data.link ? (
+                <a
+                  href={project.data.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="post-detail-read-time"
+                  style="text-decoration: none;"
+                >
+                  Open link ↗
+                </a>
+              ) : (
+                <span class="post-detail-read-time">Project</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {
+          project.data.gallery &&
+            project.data.gallery.length > 0 && (
+              <div class="post-content post-content-animate">
+                <div style="display:flex; gap:12px; overflow:auto; padding: 8px 2px 18px;">
+                  {project.data.gallery.map((src: string) => (
+                    <img
+                      src={src}
+                      alt={project.data.title}
+                      style="height: 160px; border-radius: 10px;"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+        }
+
+        <div class="post-content post-content-animate">
+          {
+            Content ? (
+              <Content />
+            ) : (
+              <div set:html={htmlFallback} />
+            )
+          }
+        </div>
+      </div>
+    </main>
+
+    <Footer />
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        window.scrollTo(0, 0);
+        setTimeout(() => window.scrollTo(0, 0), 0);
+      });
+
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) window.scrollTo(0, 0);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const pageContent = document.querySelector(".page-content");
+        if (pageContent) requestAnimationFrame(() => pageContent.classList.add("visible"));
+
+        const header = document.querySelector(".post-header-animate");
+        if (header) requestAnimationFrame(() => header.classList.add("visible"));
+
+        const content = document.querySelector(".post-content-animate");
+        if (content) requestAnimationFrame(() => content.classList.add("visible"));
+
+        const applyHeadingSpacing = () => {
+          const postContent = document.querySelector(".post-content");
+          if (!postContent) return;
+
+          const rootStyles = getComputedStyle(document.documentElement);
+          const getCSSVar = (name, fallback) =>
+            rootStyles.getPropertyValue(name).trim() || fallback;
+
+          const headingConfig = [
+            {
+              selector: "h2",
+              marginTopVar: "--post-h2-margin-top",
+              marginBottomVar: "--post-h2-margin-bottom",
+              contentMarginTopVar: "--post-h2-content-margin-top",
+              defaults: { marginTop: "3rem", marginBottom: "1.17rem", contentMarginTop: "1.17rem" },
+              skipFirstMarginTop: true,
+            },
+            {
+              selector: "h3",
+              marginTopVar: "--post-h3-margin-top",
+              marginBottomVar: "--post-h3-margin-bottom",
+              contentMarginTopVar: "--post-h3-content-margin-top",
+              defaults: { marginTop: "2.5rem", marginBottom: "1rem", contentMarginTop: "1rem" },
+              skipFirstMarginTop: false,
+            },
+            {
+              selector: "h4",
+              marginTopVar: "--post-h4-margin-top",
+              marginBottomVar: "--post-h4-margin-bottom",
+              contentMarginTopVar: "--post-h4-content-margin-top",
+              defaults: { marginTop: "2rem", marginBottom: "0.83rem", contentMarginTop: "0.83rem" },
+              skipFirstMarginTop: false,
+            },
+          ];
+
+          const contentTags = ["P", "UL", "OL", "PRE"];
+
+          headingConfig.forEach((config) => {
+            const headings = postContent.querySelectorAll(config.selector);
+            const marginTop = getCSSVar(config.marginTopVar, config.defaults.marginTop);
+            const marginBottom = getCSSVar(config.marginBottomVar, config.defaults.marginBottom);
+            const contentMarginTop = getCSSVar(config.contentMarginTopVar, config.defaults.contentMarginTop);
+
+            headings.forEach((heading) => {
+              if (!(heading instanceof HTMLElement)) return;
+
+              if (config.skipFirstMarginTop && heading.previousElementSibling === null) {
+                heading.style.marginTop = "0";
+              } else {
+                heading.style.marginTop = marginTop;
+              }
+              heading.style.marginBottom = marginBottom;
+
+              const nextElement = heading.nextElementSibling;
+              if (nextElement instanceof HTMLElement && contentTags.includes(nextElement.tagName)) {
+                nextElement.style.marginTop = contentMarginTop;
+              }
+            });
+          });
+        };
+
+        const overrideCodeStyles = () => {
+          const codeBlocks = document.querySelectorAll(".post-content pre, .post-content pre.astro-code");
+          codeBlocks.forEach((pre) => {
+            if (pre instanceof HTMLElement) {
+              pre.style.removeProperty("background-color");
+              pre.style.removeProperty("color");
+              pre.style.backgroundColor = "#f5f5f5";
+              pre.style.borderRadius = "8px";
+              pre.style.color = "#333";
+
+              const code = pre.querySelector("code");
+              if (code instanceof HTMLElement) {
+                code.style.removeProperty("background-color");
+                code.style.removeProperty("color");
+                code.style.backgroundColor = "transparent";
+                code.style.color = "#333";
+
+                const spans = code.querySelectorAll("span");
+                spans.forEach((span) => {
+                  if (span instanceof HTMLElement) {
+                    span.style.removeProperty("color");
+                    span.style.color = "#333";
+                  }
+                });
+              }
+            }
+          });
+        };
+
+        applyHeadingSpacing();
+        overrideCodeStyles();
+
+        setTimeout(() => {
+          applyHeadingSpacing();
+          overrideCodeStyles();
+        }, 100);
+
+        setTimeout(() => {
+          applyHeadingSpacing();
+          overrideCodeStyles();
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
+
