@@ -1,68 +1,67 @@
-# Astro Cartoon Portfolio
+# ardhisa.com
 
-A modern, responsive portfolio website built with Astro 5, featuring a beautiful cartoon-style design with smooth animations, interactive project carousel, blog system, and comment integration.
+Personal website and blog of **Rizkia Adhy Syahputra**.
 
-## Quick Deploy
+This site serves as a simple portfolio and a personal writing space. It’s a place where I share projects, notes, thoughts, and anything I feel like writing—technical or otherwise.
 
-[![Deploy to Tencent Cloud](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/pages/new?template=https://github.com/tomcomtang/astro-cartoon-portfolio&output-directory=./dist&build-command=npm%20run%20build&install-command=npm%20install&entry_from=childtom)
+## About
 
-## Preview
+I’m Rizkia Adhy Syahputra, a Full-Stack Developer who enjoys building and maintaining web applications. I work across backend and frontend, focusing on clear logic, structured code, and reliable systems.
 
-You can preview the project online at:
+I enjoy learning how systems work end to end, improving designs gradually, and keeping things maintainable rather than overcomplicated.
 
-<https://astro-cartoon-portfolio.edgeone.app/>
+This website is a collection of:
+- Personal and academic projects  
+- Notes and write-ups  
+- Things I’ve learned along the way  
 
-## Features
+## Sections
 
-- Cartoon-style Astro portfolio, responsive layout
-- Blog: Markdown posts, excerpts, tags, search, reading-time display, optional cover images
-- Config-driven content: site copy, project list, post images, social links
-- Comments via Giscus, SEO-friendly pages, smooth scroll animations
+- **Home**  
+  A short introduction and links to my socials.
 
-## Tech Stack
+- **Projects**  
+  A list of projects I’ve worked on.
 
-- Astro 5.x, TypeScript, Vite
-- Styling: custom CSS
-- Content: Markdown with Astro Content Collections
-- Comments: Giscus (React component)
+- **Blog**  
+  A place for notes, thoughts, and anything I feel like writing.  
+  Not limited to technical topics.
 
-## Getting Started
+- **Contact**  
+  Ways to reach me for opportunities or a simple conversation about building and maintaining software.
 
-```bash
-git clone https://github.com/tomcomtang/astro-cartoon-portfolio.git
-npm install
-npm run dev
-```
+## Contact
 
-## Paths & Purpose
+- **Email**: [rizkia.as.pac@gmail.com](mailto:rizkia.as.pac@gmail.com)  
+- **WhatsApp**: https://wa.me/6282248943527  
+- **Location**: Yogyakarta, Indonesia  
 
-- `src/pages/index.astro` – Home (hero, projects, highlights)
-- `src/pages/posts.astro` – Blog list with search/tag filter
-- `src/pages/posts/[slug].astro` – Blog detail with comments
-- `src/pages/about.astro` – About/skills section
-- `src/pages/contact.astro` – Contact info and social links
-- `src/pages/comments.astro` – Giscus standalone page
-- `src/content/posts/` – Markdown blog posts
-- `src/config/site.ts` – Site copy, nav, social, hero/about/contact text
-- `src/config/projects.ts` – Project entries (title, desc, tech, links, images)
-- `src/config/posts-images.ts` – Post slug → cover image mapping
-- `src/styles/` – Page-level styles (home, posts list/detail, contact, transitions)
-- `public/` – Static assets (images, svg, fonts)
+I usually reply as soon as possible, but it might take a bit during busy hours.
 
-## Environment Variables
+## Socials
 
-Set these for Giscus comments:
+- LinkedIn: https://www.linkedin.com/in/rizkia-as/  
+- GitHub: https://github.com/rizkia-as-pac  
 
-```env
-PUBLIC_GISCUS_REPO=your-username/your-repo
-PUBLIC_GISCUS_REPO_ID=your-repo-id
-PUBLIC_GISCUS_CATEGORY_ID=your-category-id
-```
+## Resume
+
+My resume is available here:  
+https://drive.google.com/file/d/18HpcLSwnoX0rp6gcg4pDst4u-nDD_ogU/view
+
+## Tech Stack (Website)
+
+This website is built as a static site with a focus on simplicity, readability, and maintainability.  
+The goal is to keep the structure clean and let the content speak for itself.
+
+## Credits
+
+This site is built on top of the open-source project  
+**astro-cartoon-portfolio** by Tom Tang:  
+https://github.com/tomcomtang/astro-cartoon-portfolio
+
+Big thanks to the author for making it available.
 
 ## License
 
-MIT
+© 2026 Rizkia Adhy Syahputra. All rights reserved.
 
-## Author
-
-tomcomtang

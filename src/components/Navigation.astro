@@ -42,5 +42,13 @@ const currentPath = Astro.url.pathname;
         >{siteConfig.navigation.comments}</a
       >
     </li>
+    <li>
+      <a
+        href={siteConfig.resume}
+        target="_blank"
+        class={`menu-link ${currentPath.startsWith("/resume") ? "active" : ""}`}
+        >{siteConfig.navigation.resume}</a
+      >
+    </li>
   </ul>
 </nav>
