@@ -1,114 +1,151 @@
 // Site-wide configuration
 export const siteConfig = {
-  // Site metadata
-  name: "Astro Blog",
-  title: "Astro Blog",
-  description: "A modern blog built with Astro",
-  
+  // Site metadata (SEO)
+  name: "ardhisa.com",
+  title: "Rizkia Adhy Syahputra | Backend Engineer & Full-Stack Developer",
+  description:
+    "Portfolio and technical blog of Rizkia Adhy Syahputra. Backend Engineer focused on Go, PostgreSQL, Redis, Clean Architecture, and building scalable systems including digital medical record solutions (FHIR/SATUSEHAT).",
+
   // Navigation
+  resume: "https://drive.google.com/file/d/18HpcLSwnoX0rp6gcg4pDst4u-nDD_ogU/view?usp=drive_link",
   navigation: {
     home: "Home",
-    posts: "Posts",
+    projects: "Projects",
+    posts: "Blog",
     contact: "Contact",
-    comments: "Comments",
+    resume: "My Resume",
+    // comments: "Discussion",
   },
-  
+
   // Hero Section
   hero: {
-    prefix: "I am",
-    name: "Someone Name",
-    intro: "I am a web developer and blogger, passionate about sharing knowledge and building cool things with code.\nWelcome to my portfolio blog!",
-    avatar: "/image/20943608.jpeg",
+    prefix: "Hi, I'm",
+    name: "Rizkia Adhy Syahputra",
+    intro:
+      "Full-Stack Developer who enjoys building web applications and learning how systems work end to end. I work on both frontend and backend, focusing on writing clear, maintainable code and gradually improving system design.\n\nThis site is a collection of my projects, notes, and things I’ve learned along the way.",
+    avatar: "/images/1767370257032.jpg",
     buttons: {
-      viewPosts: "View Posts",
-      contactMe: "Contact Me",
+      viewPosts: "Read Blog",
+      contactMe: "Contact",
     },
     socialLinks: [
-      { name: "Twitter", icon: "/svg/twitter.svg", url: "https://x.com/astrodotbuild" },
-      { name: "LinkedIn", icon: "/svg/linkedin.svg", url: "https://www.linkedin.com/company/astrodotbuild" },
-      { name: "Facebook", icon: "/svg/facebook.svg", url: "https://www.facebook.com/astrodotbuild" },
-      { name: "GitHub", icon: "/svg/github.svg", url: "https://github.com/tomcomtang/astro-cartoon-portfolio" },
+      {
+        name: "LinkedIn",
+        icon: "/svg/linkedin.svg",
+        url: "https://www.linkedin.com/in/rizkia-as/",
+      },
+      {
+        name: "GitHub",
+        icon: "/svg/github.svg",
+        url: "https://github.com/rizkia-as-pac",
+      },
+      {
+        name: "Email",
+        icon: "/svg/email2.svg",
+        url: "mailto:rizkia.as.pac@gmail.com",
+      },
+      {
+        name: "Whatsapp",
+        icon: "/svg/whatsapp.svg",
+        url: "https://wa.me/6282248943527",
+      },
     ],
   },
-  
+
   // About Section
   about: {
-    title: "About Me",
-    text: "Hi, I'm Someone, a passionate web developer and blogger. I love exploring new technologies and sharing knowledge with the community. On this blog, you'll find my thoughts on web development, tutorials, and project showcases. I hope my content can inspire others in their coding journey.",
+    title: "About",
+    text: "I’m Rizkia Adhy Syahputra, a Full-Stack Developer who enjoys building and maintaining web applications. I work across backend and frontend, focusing on clear logic, structured code, and reliable systems.\n\nHere I share some of my projects, technical notes, and lessons learned from practical development work.",
   },
-  
+
   // Contact Page
   contact: {
     title: "Get In Touch",
-    subtitle: "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.",
+    subtitle:
+      "Open to web developer or full-stack opportunities, especially backend, or a simple conversation about building and maintaining software.",
     info: {
       email: {
         label: "Email",
-        value: "tom@example.com",
-        link: "mailto:tom@example.com",
+        value: "rizkia.as.pac@gmail.com",
+        link: "mailto:rizkia.as.pac@gmail.com",
       },
       phone: {
         label: "Phone",
-        value: "+1 (234) 567-890",
-        link: "tel:+1 (234) 567-890",
+        value: "+62 822-4894-3527",
+        link: "https://wa.me/6282248943527",
       },
       location: {
         label: "Location",
-        value: "San Francisco, CA",
+        value: "Yogyakarta, Indonesia",
       },
     },
     followMe: {
-      title: "Follow Me",
+      title: "Socials",
       links: [
-        { name: "Twitter", icon: "/svg/twitter.svg", url: "https://x.com/astrodotbuild" },
-        { name: "LinkedIn", icon: "/svg/linkedin.svg", url: "https://www.linkedin.com/company/astrodotbuild" },
-        { name: "Facebook", icon: "/svg/facebook.svg", url: "https://www.facebook.com/astrodotbuild" },
-        { name: "GitHub", icon: "/svg/github.svg", url: "https://github.com/tomcomtang/astro-cartoon-portfolio" },
+        {
+          name: "LinkedIn",
+          icon: "/svg/linkedin.svg",
+          url: "https://www.linkedin.com/in/rizkia-as/",
+        },
+        {
+          name: "GitHub",
+          icon: "/svg/github.svg",
+          url: "https://github.com/rizkia-as-pac",
+        },
+        {
+          name: "Email",
+          icon: "/svg/email2.svg",
+          url: "mailto:rizkia.as.pac@gmail.com",
+        },
+        {
+          name: "Whatsapp",
+          icon: "/svg/whatsapp.svg",
+          url: "https://wa.me/6282248943527",
+        },
       ],
     },
     footerText: [
-      "I typically respond to messages within 24 hours during business days.",
-      "Looking forward to hearing from you! 🚀",
+      "I usually reply as soon as possible, but it might take a bit during busy hours.",
     ],
-    messageButton: "💬 Leave a Message",
+    messageButton: "Leave a Message",
   },
-  
+
   // Footer
   footer: {
-    copyright: "© 2025 Someone. All rights reserved.",
+    copyright: "© 2026 Rizkia Adhy Syahputra. All rights reserved.",
     links: [
-      { text: "Privacy Policy", url: "#" },
-      { text: "Terms of Service", url: "#" },
-      { text: "Sitemap", url: "#" },
+      // { text: "Privacy Policy", url: "/privacy" },
+      // { text: "Terms", url: "/terms" },
+      // { text: "Sitemap", url: "/sitemap.xml" },
     ],
     github: {
-      text: "Star this project on Github",
-      url: "https://github.com/tomcomtang/astro-cartoon-portfolio",
+      text: "View source on GitHub",
+      url: "https://github.com/<your-github-username>/<your-repo>",
     },
   },
-  
+
   // Posts Page
   posts: {
-    title: "Blog Posts",
-    subtitle: "Explore our latest articles on web development, design, and technology",
-    searchPlaceholder: "Search posts...",
+    title: "Blog",
+    subtitle: "A place for notes, thoughts, and anything I feel like writing.",
+    searchPlaceholder: "Search articles...",
   },
-  
+
   // Comments Page
   comments: {
-    title: "Comments & Discussion",
-    subtitle: "Share your thoughts, questions, or suggestions here. Let's connect and discuss!",
+    title: "Discussion",
+    subtitle:
+      "Share feedback, questions, or corrections. Constructive technical discussion is welcome.",
     guidelines: {
-      title: "Community Guidelines",
+      title: "Guidelines",
       items: [
-        "Be respectful and constructive in your comments",
-        "No spam, self-promotion, or advertising allowed",
-        "No personal attacks, hate speech, or harassment",
+        "Be respectful and constructive",
+        "No spam, self-promotion, or advertising",
+        "No harassment, hate speech, or personal attacks",
         "Stay on topic and keep discussions relevant",
-        "No inappropriate, offensive, or illegal content",
-        "Use clear, friendly, and inclusive language",
+        "No illegal or offensive content",
+        "Use clear and inclusive language",
       ],
     },
   },
 };
-
