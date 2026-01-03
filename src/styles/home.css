@@ -576,7 +576,11 @@ nav {
   height: 350px;
   object-fit: contain;
   border-radius: 20px;
+
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
+  filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.3));
+
   will-change: transform, opacity;
   transform-style: preserve-3d;
   backface-visibility: hidden;
