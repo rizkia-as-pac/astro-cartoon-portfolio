@@ -5,85 +5,145 @@ import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config/site";
+
+const base = import.meta.env.BASE_URL;
+const withBase = (path: string) => `${base}${path.replace(/^\//, "")}`;
+
+// untuk link eksternal vs internal (GitHub Pages aman)
+const isExternalUrl = (href: string) => /^https?:\/\//i.test(href);
+const resolveHref = (href: string) => (isExternalUrl(href) ? href : withBase(href));
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- BASE_URL aware favicon -->
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>Get In Touch - Ardhisa</title>
+
     <script>
-      // Disable browser scroll restoration and ensure page starts at top
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
-      // Immediately scroll to top on page load
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
     </script>
   </head>
+
   <body>
     <Navigation />
-    
+
     <main class="contact-page">
       <div class="contact-page-container page-content">
         <div class="contact-header contact-header-animate">
           <h1 class="contact-title">{siteConfig.contact.title}</h1>
-          <p class="contact-subtitle">
-            {siteConfig.contact.subtitle}
-          </p>
+          <p class="contact-subtitle">{siteConfig.contact.subtitle}</p>
         </div>
 
         <div class="contact-grid">
           <!-- Contact Info Card -->
           <div class="contact-card contact-card-animate">
             <h2 class="contact-card-title">Contact Info</h2>
+
             <div class="contact-info-list">
               <div class="contact-info-item">
                 <div class="contact-icon-wrapper email-icon">
-                  <img src="/svg/email.svg" alt="email icon" class="contact-icon" />
+                  <img
+                    src={withBase("/svg/email.svg")}
+                    alt="email icon"
+                    class="contact-icon"
+                    loading="lazy"
+                  />
                 </div>
+
                 <div class="contact-info-content">
-                  <div class="contact-info-label">{siteConfig.contact.info.email.label}</div>
-                  <a href={siteConfig.contact.info.email.link} class="contact-info-value">{siteConfig.contact.info.email.value}</a>
+                  <div class="contact-info-label">
+                    {siteConfig.contact.info.email.label}
+                  </div>
+                  <a
+                    href={siteConfig.contact.info.email.link}
+                    class="contact-info-value"
+                    target={siteConfig.contact.info.email.link ? "_blank" : undefined}
+                    rel={siteConfig.contact.info.email.link ? "noopener noreferrer" : undefined}
+                  >
+                    {siteConfig.contact.info.email.value}
+                  </a>
                 </div>
               </div>
 
               <div class="contact-info-item">
                 <div class="contact-icon-wrapper phone-icon">
-                  <img src="/svg/phone.svg" alt="phone icon" class="contact-icon" />
+                  <img
+                    src={withBase("/svg/phone.svg")}
+                    alt="phone icon"
+                    class="contact-icon"
+                    loading="lazy"
+                  />
                 </div>
+
                 <div class="contact-info-content">
-                  <div class="contact-info-label">{siteConfig.contact.info.phone.label}</div>
-                  <a href={siteConfig.contact.info.phone.link} class="contact-info-value">{siteConfig.contact.info.phone.value}</a>
+                  <div class="contact-info-label">
+                    {siteConfig.contact.info.phone.label}
+                  </div>
+                  <a
+                    href={resolveHref(siteConfig.contact.info.phone.link)}
+                    class="contact-info-value"
+                    target={isExternalUrl(siteConfig.contact.info.phone.link) ? "_blank" : undefined}
+                    rel={isExternalUrl(siteConfig.contact.info.phone.link) ? "noopener noreferrer" : undefined}
+                  >
+                    {siteConfig.contact.info.phone.value}
+                  </a>
                 </div>
               </div>
 
               <div class="contact-info-item">
                 <div class="contact-icon-wrapper location-icon">
-                  <img src="/svg/location.svg" alt="location icon" class="contact-icon" />
+                  <img
+                    src={withBase("/svg/location.svg")}
+                    alt="location icon"
+                    class="contact-icon"
+                    loading="lazy"
+                  />
                 </div>
+
                 <div class="contact-info-content">
-                  <div class="contact-info-label">{siteConfig.contact.info.location.label}</div>
-                  <div class="contact-info-value">{siteConfig.contact.info.location.value}</div>
+                  <div class="contact-info-label">
+                    {siteConfig.contact.info.location.label}
+                  </div>
+                  <div class="contact-info-value">
+                    {siteConfig.contact.info.location.value}
+                  </div>
                 </div>
               </div>
             </div>
-            <!-- <div class="contact-message-button-wrapper"> -->
-            <!--   <a href="/comments" class="contact-message-button">{siteConfig.contact.messageButton}</a> -->
-            <!-- </div> -->
           </div>
 
           <!-- Follow Me Card -->
           <div class="contact-card contact-card-animate">
             <h3 class="contact-card-subtitle">{siteConfig.contact.followMe.title}</h3>
+
             <div class="social-icons-list">
-              {siteConfig.contact.followMe.links.map((social) => (
-                <a href={social.url} target="_blank" rel="noopener noreferrer" class="social-icon-link" title={social.name.toLowerCase()}>
-                  <img src={social.icon} alt={`${social.name} icon`} />
-                </a>
-              ))}
+              {siteConfig.contact.followMe.links.map((social) => {
+                const href = social.url;
+                const external = isExternalUrl(social.url);
+
+                return (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel={external ? "noopener noreferrer" : undefined}
+                    class="social-icon-link"
+                    title={social.name.toLowerCase()}
+                  >
+                    <img
+                      src={resolveHref(social.icon)}
+                      alt={`${social.name} icon`}
+                      loading="lazy"
+                    />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -99,45 +159,26 @@ import { siteConfig } from "../config/site";
     <Footer />
 
     <script>
-      // Ensure scroll position is at top after DOM loads
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
         window.scrollTo(0, 0);
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-        }, 0);
-      });
-      // Also ensure on page show (handles back/forward navigation)
-      window.addEventListener('pageshow', (event) => {
-        if (event.persisted) {
-          window.scrollTo(0, 0);
-        }
+        setTimeout(() => window.scrollTo(0, 0), 0);
       });
 
-      // Initialize page transition animations
-      document.addEventListener('DOMContentLoaded', () => {
-        // Trigger page content animation
-        const pageContent = document.querySelector('.page-content');
-        if (pageContent) {
-          requestAnimationFrame(() => {
-            pageContent.classList.add('visible');
-          });
-        }
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) window.scrollTo(0, 0);
+      });
 
-        // Trigger header animation
-        const header = document.querySelector('.contact-header-animate');
-        if (header) {
-          requestAnimationFrame(() => {
-            header.classList.add('visible');
-          });
-        }
+      document.addEventListener("DOMContentLoaded", () => {
+        const pageContent = document.querySelector(".page-content");
+        if (pageContent) requestAnimationFrame(() => pageContent.classList.add("visible"));
 
-        // Trigger card animations
-        const cards = document.querySelectorAll('.contact-card-animate');
-        cards.forEach((card) => {
-          requestAnimationFrame(() => {
-            card.classList.add('visible');
-          });
-        });
+        const header = document.querySelector(".contact-header-animate");
+        if (header) requestAnimationFrame(() => header.classList.add("visible"));
+
+        const cards = document.querySelectorAll(".contact-card-animate");
+        cards.forEach((card) =>
+          requestAnimationFrame(() => (card as HTMLElement).classList.add("visible"))
+        );
       });
     </script>
   </body>

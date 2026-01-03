@@ -7,101 +7,86 @@ import "../../styles/page-transitions.css";
 import Navigation from "../../components/Navigation.astro";
 import Footer from "../../components/Footer.astro";
 
+const base = import.meta.env.BASE_URL;
+
 export async function getStaticPaths() {
   const projects = (await getCollection("projects")) as any[];
+
   return projects
     .map((project) => {
       // resolve slug inline (NO helper)
       let slug = project.slug;
-      console.log(`slug : ${slug}`)
-      console.log(`repo : ${project.repo}`)
-      console.log(`repo : ${JSON.stringify(project.repo)}`)
+
       if (!slug && project.id) {
-              // Extract slug from id (e.g., "posts/my-post.md" -> "my-post")
-slug = project.id.split("/").pop()?.replace(/\.md$/, "") || "";
-}
+        // Extract slug from id (e.g., "projects/my-project.md" -> "my-project")
+        slug = project.id.split("/").pop()?.replace(/\.md$/, "") || "";
+      }
 
-      console.log(`t2 slug : ${slug}`)
-      console.log(`t2 id : ${project.id}`)
-      console.log(`props : ${project}`)
-      console.log(`repo : ${project.repo}`)
-      console.log(`data.repo : ${project.data.repo}`)
-      console.log(`repo : ${JSON.stringify(project.repo)}`)
-
-      console.log(JSON.stringify(project))
       if (!slug) {
         console.warn("Project missing slug in getStaticPaths:", project);
         return null;
       }
-      return { 
-         params: { slug }, 
-         props: { project }, 
+
+      // NOTE:
+      // We keep passing project via props (same pattern as your posts page).
+      // If your Astro build strips body, this still falls back to excerpt below.
+      return {
+        params: { slug },
+        props: { project },
       };
     })
     .filter(Boolean);
 }
 
 interface Props {
-project: any;
+  project: any;
 }
 
-const {project} = Astro.props;
+const { project } = Astro.props;
 
 if (!project) {
- throw new Error(`Project is undefined`);
- }
+  throw new Error("Project is undefined");
+}
 
- let Content;
-
- console.log("body")
- console.log(project.body)
- console.log("body byuddaaa")
- console.log(project.body === "string")
+let Content: any = null;
 
 // 1) prefer rendered.Content kalau ada
-if (
-project.rendered && 
-typeof project.rendered === "object" && 
-project.rendered.Content
-) {
+if (project.rendered && typeof project.rendered === "object" && project.rendered.Content) {
   Content = project.rendered.Content;
 }
 // 2) fallback ke body manual render
-else if (project.body) {
+else if (typeof project.body === "string" && project.body.trim().length > 0) {
   const { unified } = await import("unified");
   const remarkParse = (await import("remark-parse")).default;
   const remarkRehype = (await import("remark-rehype")).default;
   const rehypeStringify = (await import("rehype-stringify")).default;
 
-  const processor = unified()
-  .use(remarkParse)
-  .use(remarkRehype)
-  .use(rehypeStringify);
-
+  const processor = unified().use(remarkParse).use(remarkRehype).use(rehypeStringify);
   const result = await processor.process(project.body);
   Content = String(result);
 }
-// 3) kalau body kosong: tampilkan excerpt biar ada deskripsi
- else {
-   throw new Error(
-    `Cannot find content in project. Available keys: ${Object.keys(project).join(", ")}`
-  );
+// 3) kalau body/render tidak ada: tampilkan excerpt biar ada “deskripsi”
+else {
+  const fallback = project.data?.excerpt || "";
+  Content = fallback ? `<p>${fallback}</p>` : "";
 }
+
+// Repo link (optional) - open in new tab if external
+const repoHref: string | null = project.data?.repo || null;
+const isExternalRepo = !!repoHref && /^https?:\/\//i.test(repoHref);
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>{project.data.title} - Projects</title>
-<script>
-        // Disable browser scroll restoration and ensure page starts at top
+    <script>
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
-      // Immediately scroll to top on page load
       window.scrollTo(0, 0);
     </script>
   </head>
@@ -112,42 +97,59 @@ else if (project.body) {
     <main class="post-detail-page">
       <div class="post-detail-container page-content">
         <div class="project-header-card project-header-animate">
-
           <div class="top-part">
-              <h1 class="project-detail-title">{project.data.title}</h1>
+            <h1 class="project-detail-title">{project.data.title}</h1>
 
-              {
-                project.data.techStack &&
-                  project.data.techStack.length > 0 && (
-                    <div class="project-detail-techs">
-                      {project.data.techStack.map((t: any) => (
-                        <div class="project-detail-tech">
-                          {t.icon && ( <img src={t.icon} loading="lazy" />)}
-                          <p>{t.name}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )
-              }
+            {
+              project.data.techStack &&
+                project.data.techStack.length > 0 && (
+                  <div class="project-detail-techs">
+                    {project.data.techStack.map((t: any) => (
+                      <div class="project-detail-tech">
+                        {t.icon && <img src={`${base}${String(t.icon).replace(/^\//, "")}`} loading="lazy" />}
+                        <p>{t.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                )
+            }
           </div>
 
           <div class="post-detail-meta">
-            <a href="/projects" class="post-back-button"> ← Back to Projects </a>
+            <a href={`${base}projects`} class="post-back-button"> ← Back to Projects </a>
 
-             {project.data.repo && (
-                 <a href="/projects" class="project-more-button">
-                   <img src="/svg/github2.svg" alt="Github" style="height: 24px;" loading="lazy" />
-                   <span>See more on github</span>
-                 </a>
-             )}
-
-
+            {repoHref && (
+              <a
+                href={repoHref}
+                class="project-more-button"
+                target={isExternalRepo ? "_blank" : undefined}
+                rel={isExternalRepo ? "noopener noreferrer" : undefined}
+              >
+                <img
+                  src={`${base}svg/github2.svg`}
+                  alt="Github"
+                  style="height: 24px;"
+                  loading="lazy"
+                />
+                <span>See more on github</span>
+              </a>
+            )}
 
             <div class="project-detail-meta-info">
               {project.data.organization && (
                 <span class="post-detail-author">{project.data.organization}</span>
               )}
-                 <span class="post-detail-date">{project.data.date}</span>
+
+              {project.data.start_date && (
+                <span class="post-detail-date">
+                  {project.data.start_date} - {project.data.completion_date ?? "PRESENT"}
+                </span>
+              )}
+
+              {!project.data.start_date && (
+                <span class="post-detail-date">{project.data.date}</span>
+              )}
+              
             </div>
           </div>
         </div>
@@ -155,16 +157,31 @@ else if (project.body) {
         {
           project.data.gallery &&
             project.data.gallery.length > 0 && (
-               <div class="post-gallery" >
-                 {project.data.gallery.map((src: string) => (
-                   <img
-                     src={src}
-                     alt="Image from project"
-                     style="height: 160px; border-radius: 10px;"
-                     loading="lazy"
-                   />
-                 ))}
-               </div>
+              <!-- <div class="project-gallery"> -->
+              <!--   {project.data.gallery.map((src: string) => ( -->
+              <!--     <img -->
+              <!--       src={`${base}${String(src).replace(/^\//, "")}`} -->
+              <!--       alt="Image from project" -->
+              <!--       loading="lazy" -->
+              <!--     /> -->
+              <!--   ))} -->
+              <!-- </div> -->
+              <div
+        class="project-gallery"
+        style={
+          project.data.gallery_column
+            ? `columns: ${project.data.gallery_column};`
+        : `columns: 3;`
+        }
+      >
+        {project.data.gallery.map((src: string) => (
+          <img
+            src={`${base}${String(src).replace(/^\//, "")}`}
+            alt="Image from project"
+            loading="lazy"
+          />
+        ))}
+      </div>
             )
         }
 
@@ -177,7 +194,6 @@ else if (project.body) {
             )
           }
         </div>
-
       </div>
     </main>
 
