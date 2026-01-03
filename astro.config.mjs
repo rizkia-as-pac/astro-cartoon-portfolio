@@ -7,6 +7,8 @@ import react from "@astrojs/react";
 // https://astro.build/config
 export default defineConfig({
   // adapter: edgeoneAdapter(),
+  site: "https://rizkia-as-pac.github.io",
+  base: "/portfolio/",
   output: "static",
   integrations: [react()],
 });
