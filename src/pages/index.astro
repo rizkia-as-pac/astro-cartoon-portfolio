@@ -2,6 +2,7 @@
 import "../styles/home.css";
 import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
+import Jack from "../components/Jack.astro";
 import HeroSection from "../components/HeroSection.astro";
 import AboutSection from "../components/AboutSection.astro";
 import SkillSection from "../components/SkillSection.astro";
@@ -33,12 +34,13 @@ import Footer from "../components/Footer.astro";
   </head>
   <body>
     <Navigation />
+    <Jack />
     <HeroSection />
     <!-- <AboutSection /> -->
     <!-- <ProjectsSection /> -->
     <NovoProjectsSection />
-    <!-- <ProficiencySection /> -->
     <SkillSection />
+    <!-- <ProficiencySection /> -->
     <Footer />
     <script>
       // Ensure scroll position is at top after DOM loads

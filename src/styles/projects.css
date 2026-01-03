@@ -1,3 +1,23 @@
+.project-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  min-height: auto;
+}
+
+.project-summary:hover {
+  background-color: #f7fafc;
+}
+
+.project-summary:hover .post-title a {
+  color: #76cfc5;
+}
+
 .project-meta {
   display: flex;
   flex-direction: column;
@@ -55,4 +75,14 @@ div.project-tech img {
   object-fit: contain;
   display: block;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .project-summary {
+    flex-direction: column;
+  }
+
+  .project-meta {
+    width: 100%;
+  }
 }

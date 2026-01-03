@@ -5,6 +5,7 @@ import "../../styles/post-detail.css";
 import "../../styles/project-detail.css";
 import "../../styles/page-transitions.css";
 import Navigation from "../../components/Navigation.astro";
+import Jack from "../../components/Jack.astro";
 import Footer from "../../components/Footer.astro";
 
 const base = import.meta.env.BASE_URL;
@@ -93,6 +94,7 @@ const isExternalRepo = !!repoHref && /^https?:\/\//i.test(repoHref);
 
   <body>
     <Navigation />
+    <Jack />
 
     <main class="post-detail-page">
       <div class="post-detail-container page-content">

@@ -4,6 +4,7 @@ import "../../styles/home.css";
 import "../../styles/post-detail.css";
 import "../../styles/page-transitions.css";
 import Navigation from "../../components/Navigation.astro";
+import Jack from "../../components/Jack.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
@@ -79,6 +80,7 @@ else if (project?.data?.excerpt) {
 
   <body>
     <Navigation />
+    <Jack />
 
     <main class="post-detail-page">
       <div class="post-detail-container page-content">
