@@ -3,6 +3,7 @@ import "../styles/home.css";
 import "../styles/comments.css";
 import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
+import Jack from "../components/Jack.astro";
 import Footer from "../components/Footer.astro";
 import GiscusComments from "../components/GiscusComments";
 import { siteConfig } from "../config/site";
@@ -31,6 +32,7 @@ import { siteConfig } from "../config/site";
   </head>
   <body>
     <Navigation />
+    <Jack />
 
     <main class="comments-page">
       <div class="comments-page-container page-content">
@@ -289,6 +291,7 @@ const allTech = Array.from(
   </head>
   <body>
     <Navigation />
+    <Jack />
 
     <main class="posts-page">
       <div class="posts-container page-content">

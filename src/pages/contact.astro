@@ -3,6 +3,7 @@ import "../styles/home.css";
 import "../styles/contact.css";
 import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
+import Jack from "../components/Jack.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config/site";
 
@@ -33,6 +34,7 @@ const resolveHref = (href: string) => (isExternalUrl(href) ? href : withBase(hre
 
   <body>
     <Navigation />
+    <Jack />
 
     <main class="contact-page">
       <div class="contact-page-container page-content">

@@ -4,6 +4,7 @@ import "../styles/home.css";
 import "../styles/posts.css";
 import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
+import Jack from "../components/Jack.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config/site";
 import { postImages, defaultPostImage } from "../config/posts-images";
@@ -104,6 +105,7 @@ const allTags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort();
 
   <body>
     <Navigation />
+    <Jack />
 
     <main class="posts-page">
       <div class="posts-container page-content">

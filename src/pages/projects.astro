@@ -5,6 +5,7 @@ import "../styles/posts.css";
 import "../styles/projects.css";
 import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
+import Jack from "../components/Jack.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config/site";
 
@@ -142,6 +143,7 @@ const allTech = Array.from(
 
   <body>
     <Navigation />
+    <Jack />
 
     <main class="posts-page">
       <div class="posts-container page-content">
@@ -215,7 +217,7 @@ const allTech = Array.from(
 
                   return (
                     <article class="post-item" data-post-id={project.slug}>
-                      <div class="post-summary">
+                      <div class="project-summary">
                         <div class="title-icon-left" />
                         <h3 class="post-title">
                           <a
@@ -334,7 +336,7 @@ const allTech = Array.from(
 
   // Expand/collapse behavior
   const postToggles = document.querySelectorAll(".post-toggle");
-  const postSummaries = document.querySelectorAll(".post-summary");
+  const postSummaries = document.querySelectorAll(".project-summary");
 
   postToggles.forEach((toggle) => {
     toggle.addEventListener("click", (e) => {
