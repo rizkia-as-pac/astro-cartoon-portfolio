@@ -46,7 +46,7 @@ I usually reply as soon as possible, but it might take a bit during busy hours.
 ## Resume
 
 My resume is available here:  
-https://drive.google.com/file/d/18HpcLSwnoX0rp6gcg4pDst4u-nDD_ogU/view
+[https://drive.google.com/file/d/18HpcLSwnoX0rp6gcg4pDst4u-nDD_ogU/view](https://drive.google.com/file/d/1R_alXXMe7-IxIX3Lv34ST94Kd8dJy1fe/view?usp=sharing)
 
 ## Tech Stack (Website)
 
