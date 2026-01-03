@@ -20,6 +20,7 @@ const projects = defineCollection({
     title: z.string(),
     date: z.string(),
     organization: z.string().optional(),
+    repo: z.string().url().optional(),
     link: z.string().url().optional(),
     excerpt: z.string().optional(),
     techStack: z
