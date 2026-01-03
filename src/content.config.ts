@@ -19,6 +19,8 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.string(),
+    start_date: z.string().optional(),
+    completion_date: z.string().optional(),
     organization: z.string().optional(),
     repo: z.string().url().optional(),
     link: z.string().url().optional(),
@@ -31,6 +33,7 @@ const projects = defineCollection({
         }),
       )
       .default([]),
+    gallery_column: z.number().int().positive().optional(),
     gallery: z.array(z.string()).default([]),
   }),
 });
