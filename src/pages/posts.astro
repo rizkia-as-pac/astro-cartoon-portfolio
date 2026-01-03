@@ -90,6 +90,7 @@ const posts = await Promise.all(
       readTime: post.data.readTime || "5 min read",
       slug: slug,
       image: image,
+      link: post.data.link || null,
     };
   })
 );
@@ -123,7 +124,7 @@ const allTags = Array.from(
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <title>Blog Posts - Astro Blog</title>
+    <title>Blog Posts - Ardhisa</title>
     <script>
       // Disable browser scroll restoration and ensure page starts at top
       if ("scrollRestoration" in history) {
@@ -197,60 +198,120 @@ const allTags = Array.from(
               <div class="date-group" data-date={date}>
                 <h2 class="date-header">{date}</h2>
                 <div class="date-card">
-                  {datePosts.map((post) => (
-                    <article class="post-item" data-post-id={post.slug}>
-                      <div class="post-summary">
-                        <div class="title-icon-left" />
-                        <h3 class="post-title">
-                          <a
-                            href={`/posts/${post.slug}`}
-                            class="post-title-link"
-                          >
-                            {post.title}
-                          </a>
-                          <div class="title-icon-right" />
-                        </h3>
-                        {post.tags.length > 0 && (
-                          <div class="post-tags">
-                            {post.tags.map((tag: string) => (
+                  {datePosts.map((post) => {
+                    const isExternal = !!post.link;
+                    const href = post.link ?? `/posts/${post.slug}`;
+                  
+                    return (
+                      <article class="post-item" data-post-id={post.slug}>
+                        <div class="post-summary">
+                          <div class="title-icon-left" />
+                          <h3 class="post-title">
+                            <a
+                              href={href}
+                              class="post-title-link"
+                              target={isExternal ? "_blank" : undefined}
+                              rel={isExternal ? "noopener noreferrer" : undefined}
+                            >
+                              {post.title}
+                            </a>
+                            <div class="title-icon-right" />
+                          </h3>
+                  
+                          {post.tags.length > 0 && (
+                            <div class="post-tags">
+                              {post.tags.map((tag: string) => (
                               <span class="post-tag">{tag}</span>
-                            ))}
-                          </div>
-                        )}
-                        <button
-                          class="post-toggle"
-                          aria-label="Toggle post details"
-                        >
-                          <span class="post-arrow">↓</span>
-                        </button>
-                      </div>
-                      <div class="post-details">
-                        <div class="post-content-wrapper">
-                          <div class="post-excerpt-wrapper">
-                            <p class="post-excerpt">{post.excerpt}</p>
-                            <div class="post-footer">
-                              <a
-                                href={`/posts/${post.slug}`}
-                                class="post-read-more"
-                              >
-                                Read more →
-                              </a>
-                              <span class="post-read-time">
-                                ⏱️ {post.readTime}
-                              </span>
+                              ))}
+                            </div>
+                          )}
+                  
+                          <button class="post-toggle" aria-label="Toggle post details">
+                            <span class="post-arrow">↓</span>
+                          </button>
+                        </div>
+                  
+                        <div class="post-details">
+                          <div class="post-content-wrapper">
+                            <div class="post-excerpt-wrapper">
+                              <p class="post-excerpt">{post.excerpt}</p>
+                              <div class="post-footer">
+                                <a
+                                  href={href}
+                                  class="post-read-more"
+                                  target={isExternal ? "_blank" : undefined}
+                                  rel={isExternal ? "noopener noreferrer" : undefined}
+                                >
+                                  Read more →
+                                </a>
+                                <span class="post-read-time">⏱️ {post.readTime}</span>
+                              </div>
+                            </div>
+                  
+                            <div class="post-image-container">
+                              <img src={post.image} alt={post.title} class="post-image" />
                             </div>
                           </div>
-                          <div class="post-image-container">
-                            <img
-                              src={post.image}
-                              alt={post.title}
-                              class="post-image"
-                            />
-                          </div>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
+
+                  <!-- {datePosts.map((post) => ( -->
+                  <!--   <article class="post-item" data-post-id={post.slug}> -->
+                  <!--     <div class="post-summary"> -->
+                  <!--       <div class="title-icon-left" /> -->
+                  <!--       <h3 class="post-title"> -->
+                  <!--         <a -->
+                  <!--           href={`/posts/${post.slug}`} -->
+                  <!--           class="post-title-link" -->
+                  <!--         > -->
+                  <!--           {post.title} -->
+                  <!--         </a> -->
+                  <!--         <div class="title-icon-right" /> -->
+                  <!--       </h3> -->
+                  <!--       {post.tags.length > 0 && ( -->
+                  <!--         <div class="post-tags"> -->
+                  <!--           {post.tags.map((tag: string) => ( -->
+                  <!--             <span class="post-tag">{tag}</span> -->
+                  <!--           ))} -->
+                  <!--         </div> -->
+                  <!--       )} -->
+                  <!--       <button -->
+                  <!--         class="post-toggle" -->
+                  <!--         aria-label="Toggle post details" -->
+                  <!--       > -->
+                  <!--         <span class="post-arrow">↓</span> -->
+                  <!--       </button> -->
+                  <!--     </div> -->
+                  <!--     <div class="post-details"> -->
+                  <!--       <div class="post-content-wrapper"> -->
+                  <!--         <div class="post-excerpt-wrapper"> -->
+                  <!--           <p class="post-excerpt">{post.excerpt}</p> -->
+                  <!--           <div class="post-footer"> -->
+                  <!--             <a -->
+                  <!--               href={`/posts/${post.slug}`} -->
+                  <!--               class="post-read-more" -->
+                  <!--             > -->
+                  <!--               Read more → -->
+                  <!--             </a> -->
+                  <!--             <span class="post-read-time"> -->
+                  <!--               ⏱️ {post.readTime} -->
+                  <!--             </span> -->
+                  <!--           </div> -->
+                  <!--         </div> -->
+                  <!--         <div class="post-image-container"> -->
+                  <!--           <img -->
+                  <!--             src={post.image} -->
+                  <!--             alt={post.title} -->
+                  <!--             class="post-image" -->
+                  <!--           /> -->
+                  <!--         </div> -->
+                  <!--       </div> -->
+                  <!--     </div> -->
+                  <!--   </article> -->
+                  <!-- ))} -->
+
                 </div>
               </div>
             ))

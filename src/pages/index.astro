@@ -4,8 +4,10 @@ import "../styles/page-transitions.css";
 import Navigation from "../components/Navigation.astro";
 import HeroSection from "../components/HeroSection.astro";
 import AboutSection from "../components/AboutSection.astro";
+import SkillSection from "../components/SkillSection.astro";
 import ProficiencySection from "../components/ProficiencySection.astro";
 import ProjectsSection from "../components/ProjectsSection.astro";
+import NovoProjectsSection from "../components/NovoProjectsSection.astro";
 import Footer from "../components/Footer.astro";
 ---
 
@@ -15,7 +17,7 @@ import Footer from "../components/Footer.astro";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <title>Astro Blog</title>
+    <title>Ardhisa</title>
     <script>
       // Disable browser scroll restoration and ensure page starts at top
       if ("scrollRestoration" in history) {
@@ -28,9 +30,11 @@ import Footer from "../components/Footer.astro";
   <body>
     <Navigation />
     <HeroSection />
-    <AboutSection />
-    <ProjectsSection />
-    <ProficiencySection />
+    <!-- <AboutSection /> -->
+    <!-- <ProjectsSection /> -->
+    <NovoProjectsSection />
+    <!-- <ProficiencySection /> -->
+    <SkillSection />
     <Footer />
     <script>
       // Ensure scroll position is at top after DOM loads
