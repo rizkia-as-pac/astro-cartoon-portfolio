@@ -1,0 +1,126 @@
+.project-header-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.project-header-card .top-part {
+  display: flex;
+  align-items: center;
+}
+
+.project-detail-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #76cfc5 0%, #ffb400 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  margin: 0;
+  word-break: break-word;
+  text-align: left;
+  flex: 1;
+  display: block;
+}
+
+.project-detail-techs {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.2rem 0;
+  justify-content: end;
+}
+
+div.project-detail-tech {
+  padding: 0.4rem 1rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 2px solid #76cfc5;
+  border-radius: 20px;
+  background-color: rgba(118, 207, 197, 0.1);
+  color: #76cfc5;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0px !important;
+}
+
+div.project-detail-tech p,
+div.project-detail-tech img {
+  margin-bottom: 0;
+}
+
+.project-detail-tech img {
+  display: block;
+  width: 24px;
+  height: auto;
+}
+
+.project-more-button {
+  color: #76cfc5;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+  gap: 0.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-more-button img {
+  margin: 0;
+}
+
+.project-more-button:hover {
+  color: #4eb1c1;
+}
+
+.project-detail-meta-info {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.post-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+  gap: 1rem;
+
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.post-gallery img {
+  object-fit: cover;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .project-detail-title {
+    font-size: 1.75rem;
+  }
+
+  .project-header-card {
+    padding: 2rem 1.5rem;
+  }
+}
