@@ -7,7 +7,7 @@ export const siteConfig = {
     "Portfolio and technical blog of Rizkia Adhy Syahputra. Backend Engineer focused on Go, PostgreSQL, Redis, Clean Architecture, and building scalable systems including digital medical record solutions (FHIR/SATUSEHAT).",
 
   // Navigation
-  resume: "https://drive.google.com/file/d/18HpcLSwnoX0rp6gcg4pDst4u-nDD_ogU/view?usp=drive_link",
+  resume: "https://drive.google.com/file/d/1R_alXXMe7-IxIX3Lv34ST94Kd8dJy1fe/view?usp=sharing",
   navigation: {
     home: "Home",
     projects: "Projects",
